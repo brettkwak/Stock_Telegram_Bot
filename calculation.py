@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # Load environment variables from .env
 load_dotenv()
@@ -33,13 +33,15 @@ headers = {
     "tr_id": "HHDFS76240000"
 }
 
+date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
+
 # API Request Parameter
 params = {
     "AUTH": "",
     "EXCD": "NAS",
     "SYMB": "QQQ",
     "GUBN": "0",
-    "BYMD": "",
+    "BYMD": date,
     "MODP": "1",
 }
 

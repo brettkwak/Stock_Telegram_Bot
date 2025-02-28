@@ -78,6 +78,19 @@ if response.status_code == 200:
             end_date = datetime.now().strftime("%Y%m%d")
             print(f"End date : {end_date}\n")
 
+            # Calculate MA 160
+            prices = [float(item['clos']) for item in data['output2']]
+
+            if len(prices) >= 160:
+                ma_160 = sum(prices[:160]) / 160
+            else:
+                ma_160 = None
+
+            if ma_160:
+                print(f"QQQ 160일 이동평균가: {ma_160:.2f}")
+            else:
+                print("데이터 부족")
+
 
             # Save to JSON file
             try:

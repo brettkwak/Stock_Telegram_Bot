@@ -10,7 +10,7 @@ load_dotenv()
 
 def get_access_token():
     try:
-        with open('stock_token.json', 'r') as token_file:
+        with open('../stock_token.json', 'r') as token_file:
             token_data = json.load(token_file)
             return token_data.get('authorization', '')
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
@@ -24,31 +24,30 @@ APP_SECRET = os.getenv("APP_SECRET")
 ACCESS_TOKEN = get_access_token()
 
 
-# Set start & end date
-end_date = datetime.now(timezone.utc).strftime("%Y%m%d")
-start_date = (datetime.now() - timedelta(days=400)).strftime("%Y%m%d")
-
 # API Request Header
 headers = {
     "content-type": "application/json; charset=utf-8",
     "authorization": f"Bearer {ACCESS_TOKEN}",
     "appkey": APP_KEY,
     "appsecret": APP_SECRET,
-    "tr_id": "FHKST03030100",
+    "tr_id": "HHDFS76240000"
 }
+
+date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
 
 # API Request Parameter
 params = {
-    "FID_COND_MRKT_DIV_CODE": "N",
-    "FID_INPUT_ISCD": "QQQ",
-    "FID_INPUT_DATE_1": start_date,
-    "FID_INPUT_DATE_2": end_date,
-    "FID_PERIOD_DIV_CODE": "D",
+    "AUTH": "",
+    "EXCD": "NAS",
+    "SYMB": "QQQ",
+    "GUBN": "0",
+    "BYMD": date,
+    "MODP": "1",
 }
 
 # API request
 response = requests.get(
-    url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/inquire-daily-chartprice",
+    url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
     headers=headers,
     params=params
 )
@@ -58,43 +57,33 @@ if response.status_code == 200:
     data = response.json()
     print(f"Retrieved {len(data.get('output2', []))} new records")
 
-    start_date = data['output2'][-1]['stck_bsop_date']
-    print(f"\nStart date : {start_date}")
-    print(f"End date : {end_date}")
-
-
     # Get Subsequent data
-    new_end_date = (datetime.strptime(start_date, "%Y%m%d")
+    last_date = data['output2'][-1]['xymd']
+    last_date = (datetime.strptime(last_date, "%Y%m%d")
                      - timedelta(days=1)).strftime("%Y%m%d")
-    new_start_date = (datetime.strptime(new_end_date, "%Y%m%d")
-                     - timedelta(days=400)).strftime("%Y%m%d")
-    params['FID_INPUT_DATE_1'] = new_start_date
-    params['FID_INPUT_DATE_2'] = new_end_date
+    print(f"Last available date: {last_date}")
+    params['BYMD'] = last_date
     second_response = requests.get(
-        url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/inquire-daily-chartprice",
+        url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
         headers=headers,
         params=params
     )
 
     if second_response.status_code == 200:
             new_data = second_response.json()
-            print(f"\nRetrieved {len(new_data.get('output2', []))} new records")
+            print(f"Retrieved {len(new_data.get('output2', []))} new records")
 
             # Append new data to existing data
             data['output2'].extend(new_data.get('output2', []))
             print(f"Total records: {len(data['output2'])}")
 
-            new_start_date = data['output2'][-1]['stck_bsop_date']
-            print(f"\nNew Start date : {new_start_date}")
-            print(f"New End date : {end_date}\n")
+            start_date = data['output2'][-1]['xymd']
+            print(f"\nStart date : {start_date}")
+            end_date = datetime.now().strftime("%Y%m%d")
+            print(f"End date : {end_date}\n")
 
             # Calculate MA 160
-            prices = [float(item['ovrs_nmix_prpr']) for item in data['output2']]
-            dates = [(item['stck_bsop_date']) for item in data['output2']]
-
-            for i in range(160):
-                print(f"{dates[i]} : {prices[i]}")
-
+            prices = [float(item['clos']) for item in data['output2']]
 
             if len(prices) >= 160:
                 ma_160 = sum(prices[:160]) / 160

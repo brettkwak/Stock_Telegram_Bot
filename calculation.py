@@ -57,6 +57,8 @@ if response.status_code == 200:
 
     # Get Subsequent data
     last_date = data['output2'][-1]['xymd']
+    last_date = (datetime.strptime(last_date, "%Y%m%d")
+                     - timedelta(days=1)).strftime("%Y%m%d")
     print(f"Last available date: {last_date}")
     params['BYMD'] = last_date
     second_response = requests.get(

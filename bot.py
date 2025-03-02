@@ -12,6 +12,7 @@ load_dotenv()
 
 # Store chat ID
 CHAT_ID = os.getenv("CHAT_ID")
+bot_running = False
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -30,14 +31,21 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await application.stop()
 
 
+async def repeat_message(application):
+    global bot_running
+    while bot_running:
+        sign = signal()
+        if sign:
+            print(f"Cross Detected : {sign}")
+            await application.bot.send_message(chat_id=CHAT_ID, text=sign)
+        await asyncio.sleep(10)
 
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online")
+    global bot_running
+    bot_running = True
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
-    sign = signal()
-    if (sign):
-        print(f"Cross Detected : {sign}")
-        await application.bot.send_message(chat_id=CHAT_ID, text=sign)
+    asyncio.create_task(repeat_message(application))
 
 async def send_stop_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline")
@@ -47,6 +55,7 @@ async def send_stop_message(application):
 async def schedule_shutdown(application):
     now = datetime.datetime.now()
     shutdown_time = now.replace(hour=6, minute=5, second=0, microsecond=0)
+    global bot_running
 
     seconds_until_shutdown = (shutdown_time - now).total_seconds()
     logging.info(f"Bot will shut down in {seconds_until_shutdown / 3600:.2f} hours.")
@@ -54,6 +63,7 @@ async def schedule_shutdown(application):
     if seconds_until_shutdown > 0:
         await asyncio.sleep(seconds_until_shutdown)
 
+    bot_running = False
     await send_stop_message(application)
     await application.stop()
 

@@ -37,4 +37,6 @@ def get_token(dist="REAL"):
     else:
         raise Exception('status code not 200 & Token Auth Fail!')
 
-get_token()
+
+if __name__ == '__main__':
+    get_token()

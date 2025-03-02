@@ -23,6 +23,13 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
 
+async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global bot_running
+    bot_running = False
+    await send_stop_message(application)
+    await application.stop()
+
+
 
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online")
@@ -58,6 +65,9 @@ if __name__ == '__main__':
 
     start_handler = CommandHandler('start', start)
     application.add_handler(start_handler)
+
+    stop_handler = CommandHandler('stop', stop)
+    application.add_handler(stop_handler)
 
     # Run bot
     application.run_polling()

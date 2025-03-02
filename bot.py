@@ -3,6 +3,8 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 import os
 from dotenv import load_dotenv
+import datetime
+import asyncio
 
 # Load environment variables
 load_dotenv()
@@ -23,8 +25,24 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online")
+    asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
 async def send_stop_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline")
+
+
+# Schedule Bot Shutdown
+async def schedule_shutdown(application):
+    now = datetime.datetime.now()
+    shutdown_time = now.replace(hour=6, minute=5, second=0, microsecond=0)
+
+    seconds_until_shutdown = (shutdown_time - now).total_seconds()
+    logging.info(f"Bot will shut down in {seconds_until_shutdown / 3600:.2f} hours.")
+
+    if seconds_until_shutdown > 0:
+        await asyncio.sleep(seconds_until_shutdown)
+
+    await send_stop_message(application)
+    await application.stop()
 
 if __name__ == '__main__':
     application = (ApplicationBuilder().token(os.getenv("BOT_TOKEN"))

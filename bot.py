@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 import datetime
 import asyncio
+from api_dailyprice.determine_cross import signal
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +27,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online")
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
+    sign = signal()
+    if (sign):
+        print(f"Cross Detected : {sign}")
+        await application.bot.send_message(chat_id=CHAT_ID, text=sign)
+
 async def send_stop_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline")
 

@@ -18,13 +18,13 @@ def signal():
     clos_values = [float(entry["clos"]) for entry in data['output2'][:long_num+1]]
     # print(clos_values)
 
-    current_short_ma = sum(clos_values[0:short_num]) / short_num
-    current_long_ma = sum(clos_values[0:long_num]) / long_num
+    current_short_ma = round((sum(clos_values[0:short_num]) / short_num),2)
+    current_long_ma = round((sum(clos_values[0:long_num]) / long_num), 2)
     # print(f"{short_num} MA : {current_short_ma}")
     # print(f"{long_num} MA : {current_long_ma}")
 
-    prev_short_ma = sum(clos_values[1:short_num+1]) / short_num
-    prev_long_ma = sum(clos_values[1:long_num+1]) / long_num
+    prev_short_ma = round((sum(clos_values[1:short_num+1]) / short_num), 2)
+    prev_long_ma = round((sum(clos_values[1:long_num+1]) / long_num), 2)
     # print(f"prev {short_num} MA : {prev_short_ma}")
     # print(f"prev {long_num} MA : {prev_long_ma}")
 

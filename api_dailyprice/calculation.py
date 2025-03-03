@@ -35,7 +35,7 @@ headers = {
     "tr_id": "HHDFS76240000"
 }
 
-date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y%m%d")
+date = (datetime.now(timezone.utc)).strftime("%Y%m%d")
 
 # API Request Parameter
 params = {

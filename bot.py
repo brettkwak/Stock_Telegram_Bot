@@ -38,14 +38,14 @@ async def repeat_message(application):
         await asyncio.sleep(10)
 
 async def send_startup_message(application):
-    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online")
+    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online", disable_notification=True)
     global bot_running
     bot_running = True
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
     asyncio.create_task(repeat_message(application))
 
 async def send_stop_message(application):
-    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline")
+    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline", disable_notification=True)
 
 
 # Schedule Bot Shutdown

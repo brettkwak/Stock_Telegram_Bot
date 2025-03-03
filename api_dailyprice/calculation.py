@@ -3,6 +3,7 @@ import json
 import requests
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
+import generate_token
 
 # Load environment variables from .env
 load_dotenv()
@@ -46,6 +47,18 @@ params = {
 }
 
 # API request
+response = requests.get(
+    url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
+    headers=headers,
+    params=params
+)
+
+if response.status_code == 500:
+    print("Invalid TOKEN Key")
+    print("Requesting TOKEN..")
+    generate_token.get_token()
+    headers["authorization"] = f"Bearer {get_access_token()}",
+
 response = requests.get(
     url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
     headers=headers,

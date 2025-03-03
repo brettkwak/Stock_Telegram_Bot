@@ -3,7 +3,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 import os
 from dotenv import load_dotenv
-import datetime
+from datetime import datetime, timedelta
 import asyncio
 from api_dailyprice.determine_cross import check_signal
 
@@ -50,9 +50,9 @@ async def send_stop_message(application):
 
 # Schedule Bot Shutdown
 async def schedule_shutdown(application):
-    now = datetime.datetime.now()
-    shutdown_time = now.replace(hour=6, minute=5, second=0, microsecond=0)
     global bot_running
+    now = datetime.now()
+    shutdown_time = now + timedelta(minutes=5)
 
     seconds_until_shutdown = (shutdown_time - now).total_seconds()
     logging.info(f"Bot will shut down in {seconds_until_shutdown / 3600:.2f} hours.")

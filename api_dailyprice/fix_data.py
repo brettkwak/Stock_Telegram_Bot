@@ -1,4 +1,9 @@
 import json
+import os
+
+
+current_dir = os.path.dirname(__file__)
+data_path = os.path.join(current_dir, "stock_data.json")
 
 # Read the JSON data from the file
 with open('stock_data.json', 'r', encoding='utf-8') as file:

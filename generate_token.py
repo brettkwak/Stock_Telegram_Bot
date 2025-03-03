@@ -31,6 +31,7 @@ def get_token(dist="REAL"):
         with open('./stock_token.json', 'w') as outfile:
             json.dump(datadict, outfile)
 
+        print("TOKEN generated succesfully")
         print("My TOKEN : ", my_token)
         return my_token
 

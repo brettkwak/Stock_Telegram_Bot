@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import asyncio
 from api_dailyprice.determine_cross import check_signal
+from api_dailyprice.get_price_data import get_price_data
 
 # Load environment variables
 load_dotenv()
@@ -70,6 +71,7 @@ if __name__ == '__main__':
                    .post_stop(send_stop_message)
                    .build())
 
+    get_price_data()
 
     stop_handler = CommandHandler('stop', stop)
     application.add_handler(stop_handler)

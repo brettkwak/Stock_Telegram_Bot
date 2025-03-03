@@ -11,8 +11,9 @@ import generate_token
 
 def get_access_token():
 
-    current_dir = os.path.dirname(__file__)
-    data_path = os.path.join(current_dir, "stock_token.json")
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parent_dir = os.path.dirname(current_dir)
+    data_path = os.path.join(parent_dir, "stock_token.json")
 
     try:
         with open(data_path, 'r') as token_file:

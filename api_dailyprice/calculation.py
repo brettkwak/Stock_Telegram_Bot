@@ -3,6 +3,7 @@ import json
 import requests
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
+from api_dailyprice.fix_data import fix_data
 import generate_token
 
 # Load environment variables from .env
@@ -110,3 +111,7 @@ if response.status_code == 200:
 
 else:
     print(f"First API request failed: {response.status_code}")
+
+
+# Fix data after loading
+fix_data()

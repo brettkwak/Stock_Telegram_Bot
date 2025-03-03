@@ -3,11 +3,12 @@ import json
 import requests
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
 
 # Get OAuth Token
 def get_token(dist="REAL"):
+
+    # Load environment variables
+    load_dotenv()
 
     headers = {"content-type": "application/json"}
     body = {

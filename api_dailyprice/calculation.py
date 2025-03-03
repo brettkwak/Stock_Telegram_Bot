@@ -10,8 +10,12 @@ import generate_token
 
 
 def get_access_token():
+
+    current_dir = os.path.dirname(__file__)
+    data_path = os.path.join(current_dir, "stock_token.json")
+
     try:
-        with open('../stock_token.json', 'r') as token_file:
+        with open(data_path, 'r') as token_file:
             token_data = json.load(token_file)
             return token_data.get('authorization', '')
     except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:

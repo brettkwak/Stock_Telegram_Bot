@@ -33,6 +33,8 @@ def check_signal():
         return "✅Golden Cross✅"
     elif current_short_ma < current_long_ma and prev_short_ma > prev_long_ma:
         return "⛔Death Cross⛔"
+    else:
+        print("No Cross Detected")
 
 if __name__ == "__main__":
     print(f"Signal : {check_signal()}")

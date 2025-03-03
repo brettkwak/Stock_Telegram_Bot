@@ -1,7 +1,7 @@
 import json
 import os
 
-def signal():
+def check_signal():
 
     current_dir = os.path.dirname(__file__)
     data_path = os.path.join(current_dir, "stock_data.json")
@@ -35,4 +35,4 @@ def signal():
         return "⛔Death Cross⛔"
 
 if __name__ == "__main__":
-    print(signal())
+    print(f"Signal : {check_signal()}")

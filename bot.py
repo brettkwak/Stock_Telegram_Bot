@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 import datetime
 import asyncio
-from api_dailyprice.determine_cross import signal
+from api_dailyprice.determine_cross import check_signal
 
 # Load environment variables
 load_dotenv()
@@ -34,7 +34,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def repeat_message(application):
     global bot_running
     while bot_running:
-        sign = signal()
+        sign = check_signal()
         if sign:
             print(f"Cross Detected : {sign}")
             await application.bot.send_message(chat_id=CHAT_ID, text=sign)

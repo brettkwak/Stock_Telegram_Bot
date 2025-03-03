@@ -109,9 +109,12 @@ def get_price_data():
 
                 # Save to JSON file
                 try:
-                    with open('stock_data.json', 'w', encoding='utf-8') as f:
+                    current_dir = os.path.dirname(os.path.abspath(__file__))
+                    file_path = os.path.join(current_dir, 'stock_data.json')
+
+                    with open(file_path, 'w', encoding='utf-8') as f:
                         json.dump(data, f, indent=4, ensure_ascii=False)
-                    print(f"File saved to: {os.path.abspath('stock_data.json')}")
+                    print(f"File saved to: {file_path}")
                 except Exception as e:
                     print(f"Error saving file: {str(e)}")
 

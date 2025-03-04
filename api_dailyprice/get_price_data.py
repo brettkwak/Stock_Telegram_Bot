@@ -70,11 +70,11 @@ def get_price_data():
         generate_token.get_token()
         headers["authorization"] = f"Bearer {get_access_token()}"
 
-    response = requests.get(
-        url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
-        headers=headers,
-        params=params
-    )
+        response = requests.get(
+            url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
+            headers=headers,
+            params=params
+        )
 
     # 데이터 처리
     if response.status_code == 200:

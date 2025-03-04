@@ -7,6 +7,9 @@ from dotenv import load_dotenv
 # Get OAuth Token
 def get_token(dist="REAL"):
 
+    current_dir = os.path.dirname(__file__)
+    token_path = os.path.join(current_dir, "stock_token.json")
+
     # Load environment variables
     load_dotenv()
 
@@ -29,7 +32,7 @@ def get_token(dist="REAL"):
 
         # 해당 토큰을 작업 공간에 저장
         datadict["authorization"] = my_token
-        with open('./stock_token.json', 'w') as outfile:
+        with open(token_path, 'w') as outfile:
             json.dump(datadict, outfile)
 
         print("TOKEN generated succesfully")

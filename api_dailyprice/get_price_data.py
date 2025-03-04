@@ -68,7 +68,7 @@ def get_price_data():
         print("Invalid TOKEN Key")
         print("Requesting TOKEN..")
         generate_token.get_token()
-        headers["authorization"] = f"Bearer {get_access_token()}",
+        headers["authorization"] = f"Bearer {get_access_token()}"
 
     response = requests.get(
         url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",

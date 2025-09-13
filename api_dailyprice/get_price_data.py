@@ -81,46 +81,19 @@ def get_price_data():
         data = response.json()
         print(f"Retrieved {len(data.get('output2', []))} new records")
 
-        # Get Subsequent data
-        last_date = data['output2'][-1]['xymd']
-        last_date = (datetime.strptime(last_date, "%Y%m%d")
-                         - timedelta(days=1)).strftime("%Y%m%d")
-        print(f"Last available date: {last_date}")
-        params['BYMD'] = last_date
-        second_response = requests.get(
-            url="https://openapi.koreainvestment.com:9443/uapi/overseas-price/v1/quotations/dailyprice",
-            headers=headers,
-            params=params
-        )
+        # Save to JSON file
+        try:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            file_path = os.path.join(current_dir, 'stock_data.json')
 
-        if second_response.status_code == 200:
-                new_data = second_response.json()
-                print(f"Retrieved {len(new_data.get('output2', []))} new records")
+            with open(file_path, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+            print(f"File saved to: {file_path}")
 
-                # Append new data to existing data
-                data['output2'].extend(new_data.get('output2', []))
-                print(f"Total records: {len(data['output2'])}")
-
-                start_date = data['output2'][-1]['xymd']
-                print(f"\nStart date : {start_date}")
-                end_date = datetime.now().strftime("%Y%m%d")
-                print(f"End date : {end_date}\n")
+        except Exception as e:
+            print(f"Error saving file: {str(e)}")
 
 
-
-                # Save to JSON file
-                try:
-                    current_dir = os.path.dirname(os.path.abspath(__file__))
-                    file_path = os.path.join(current_dir, 'stock_data.json')
-
-                    with open(file_path, 'w', encoding='utf-8') as f:
-                        json.dump(data, f, indent=4, ensure_ascii=False)
-                    print(f"File saved to: {file_path}")
-                except Exception as e:
-                    print(f"Error saving file: {str(e)}")
-
-        else:
-            print(f"Second API request failed: {second_response.status_code}")
 
     else:
         print(f"First API request failed: {response.status_code}")

@@ -65,16 +65,23 @@ async def schedule_shutdown(application):
     await send_stop_message(application)
     await application.stop()
 
-if __name__ == '__main__':
+
+# Run bot
+def run_bot():
+
+    get_price_data()
+
     application = (ApplicationBuilder().token(os.getenv("BOT_TOKEN"))
                    .post_init(send_startup_message)
                    .post_stop(send_stop_message)
                    .build())
 
-    get_price_data()
-
     stop_handler = CommandHandler('stop', stop)
     application.add_handler(stop_handler)
 
-    # Run bot
+    # Start bot
     application.run_polling()
+
+
+if __name__ == '__main__':
+    run_bot()

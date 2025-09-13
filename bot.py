@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import asyncio
 from determine_cross import check_signal
-from api_dailyprice.get_price_data import get_price_data
+from update_data import update_data
 
 # Load environment variables
 load_dotenv()
@@ -38,12 +38,23 @@ async def repeat_message(application):
             await application.bot.send_message(chat_id=CHAT_ID, text=sign)
         await asyncio.sleep(10)
 
+
+# Update data every minute
+async def repeat_get_price_data():
+    global bot_running
+    while bot_running:
+        logging.info("Getting price data...")
+        update_data("api_dailyprice/stock_data_QQQ.csv")
+        await asyncio.sleep(60)
+
+
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online", disable_notification=True)
     global bot_running
     bot_running = True
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
     asyncio.create_task(repeat_message(application))
+    asyncio.create_task(repeat_get_price_data())
 
 async def send_stop_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline", disable_notification=True)
@@ -68,8 +79,6 @@ async def schedule_shutdown(application):
 
 # Run bot
 def run_bot():
-
-    get_price_data()
 
     application = (ApplicationBuilder().token(os.getenv("BOT_TOKEN"))
                    .post_init(send_startup_message)

@@ -3,7 +3,6 @@ import json
 import requests
 from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
-from api_dailyprice.fix_data import fix_data
 import generate_token
 
 
@@ -99,8 +98,6 @@ def get_price_data():
         print(f"First API request failed: {response.status_code}")
 
 
-    # Fix data after loading
-    fix_data()
 
 if __name__ == '__main__':
     get_price_data()

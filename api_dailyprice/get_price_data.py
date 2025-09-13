@@ -6,8 +6,6 @@ from datetime import datetime, timedelta, timezone
 import generate_token
 
 
-
-
 def get_access_token():
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -92,11 +90,10 @@ def get_price_data():
         except Exception as e:
             print(f"Error saving file: {str(e)}")
 
-
+        return data
 
     else:
         print(f"First API request failed: {response.status_code}")
-
 
 
 if __name__ == '__main__':

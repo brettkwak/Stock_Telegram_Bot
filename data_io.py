@@ -9,7 +9,9 @@ def csv_to_df(file_path):
     print(f"Reading CSV from: {file_path}")
 
     try:
-        return pd.read_csv(file_path)
+        df = pd.read_csv(file_path)
+        df['Date'] = pd.to_datetime(df['Date'])
+        return df
     except FileNotFoundError:
         print("CSV not found")
         return pd.DataFrame()
@@ -32,6 +34,7 @@ def json_to_df(json_data: dict):
         processed_data.append(processed_record)
 
     df = pd.DataFrame(processed_data)
+    df['Date'] = pd.to_datetime(df['Date'])
 
     return df
 

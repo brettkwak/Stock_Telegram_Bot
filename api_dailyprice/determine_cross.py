@@ -1,37 +1,41 @@
-import json
+import pandas as pd
 import os
 
 def check_signal():
 
     current_dir = os.path.dirname(__file__)
-    data_path = os.path.join(current_dir, "stock_data.json")
+    data_path = os.path.join(current_dir, "stock_data_QQQ.csv")
 
-    # Load JSON
-    with open(data_path, 'r', encoding='utf-8') as f:
-        data = json.load(f)
+    # Load CSV into pandas DataFrame
+    df = pd.read_csv(data_path)
 
-    # Set MA
-    short_num = 3
-    long_num = 160
+    df['Date'] = pd.to_datetime(df['Date'])
+    df = df.sort_values(by='Date', ascending=False).reset_index(drop=True)
 
+    # Set MA value
+    short_MA = 3
+    long_MA = 160
 
-    clos_values = [float(entry["clos"]) for entry in data['output2'][:long_num+1]]
-    # print(clos_values)
+    # Pre-Calculate MA
+    df['Short_MA'] = df['Close'].rolling(window=short_MA).mean()
+    df['Long_MA'] = df['Close'].rolling(window=long_MA).mean()
 
-    current_short_ma = round((sum(clos_values[0:short_num]) / short_num),2)
-    current_long_ma = round((sum(clos_values[0:long_num]) / long_num), 2)
-    # print(f"{short_num} MA : {current_short_ma}")
-    # print(f"{long_num} MA : {current_long_ma}")
+    # Get Today's MA
+    current_short_MA = round(df['Short_MA'].iloc[short_MA - 1], 2)
+    current_long_MA = round(df['Long_MA'].iloc[long_MA - 1], 2)
+    print(f"{short_MA} MA : {current_short_MA}")
+    print(f"{long_MA} MA : {current_long_MA}")
 
-    prev_short_ma = round((sum(clos_values[1:short_num+1]) / short_num), 2)
-    prev_long_ma = round((sum(clos_values[1:long_num+1]) / long_num), 2)
-    # print(f"prev {short_num} MA : {prev_short_ma}")
-    # print(f"prev {long_num} MA : {prev_long_ma}")
+    # Get Yesterday's MA
+    prev_short_MA = round(df['Short_MA'].iloc[short_MA], 2)
+    prev_long_MA = round(df['Long_MA'].iloc[long_MA], 2)
+    print(f"prev {short_MA} MA : {prev_short_MA}")
+    print(f"prev {long_MA} MA : {prev_long_MA}")
 
-
-    if current_short_ma > current_long_ma and prev_short_ma < prev_long_ma:
+    # Cross Check
+    if current_short_MA > current_long_MA and prev_short_MA < prev_long_MA:
         return "✅Golden Cross✅"
-    elif current_short_ma < current_long_ma and prev_short_ma > prev_long_ma:
+    elif current_short_MA < current_long_MA and prev_short_MA > prev_long_MA:
         return "⛔Death Cross⛔"
     else:
         print("No Cross Detected")

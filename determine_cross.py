@@ -4,7 +4,7 @@ import os
 def check_signal():
 
     current_dir = os.path.dirname(__file__)
-    data_path = os.path.join(current_dir, "stock_data_QQQ.csv")
+    data_path = os.path.join(current_dir, "api_dailyprice/stock_data_QQQ.csv")
 
     # Load CSV into pandas DataFrame
     df = pd.read_csv(data_path)

@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 import asyncio
-from api_dailyprice.determine_cross import check_signal
+from determine_cross import check_signal
 from api_dailyprice.get_price_data import get_price_data
 
 # Load environment variables

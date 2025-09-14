@@ -45,10 +45,14 @@ async def repeat_message(application):
 async def repeat_checking_signal():
     global bot_running, last_sign
     while bot_running:
+        await asyncio.sleep(60)
+        if not bot_running:
+            break
+
         last_sign = check_signal()
         logging.info("Getting price data...")
         update_data("api_dailyprice/stock_data_QQQ.csv")
-        await asyncio.sleep(60)
+
 
 
 async def send_startup_message(application):

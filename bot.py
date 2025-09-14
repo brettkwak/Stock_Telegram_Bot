@@ -35,7 +35,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def repeat_message(application):
     global bot_running
     while bot_running:
-        if last_sign:
+        if last_sign != "No Cross":
             print(f"Cross Detected : {last_sign}")
             await application.bot.send_message(chat_id=CHAT_ID, text=last_sign)
         await asyncio.sleep(10)

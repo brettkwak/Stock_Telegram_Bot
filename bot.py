@@ -53,8 +53,12 @@ async def repeat_checking_signal():
 
 async def send_startup_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Online", disable_notification=True)
-    global bot_running
+    global bot_running, last_sign
+
     bot_running = True
+    update_data("api_dailyprice/stock_data_QQQ.csv")
+    last_sign = check_signal()
+
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
     asyncio.create_task(repeat_message(application))
     asyncio.create_task(repeat_checking_signal())

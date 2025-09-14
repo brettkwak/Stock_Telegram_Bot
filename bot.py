@@ -28,8 +28,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global bot_running
     bot_running = False
-    await application.bot.send_message(chat_id=CHAT_ID, text="Bot Manually Stopped", disable_notification=True)
-    await application.stop()
+    await context.bot.send_message(chat_id=CHAT_ID, text="Bot Manually Stopped", disable_notification=True)
+    await context.stop()
 
 
 async def repeat_message(application):

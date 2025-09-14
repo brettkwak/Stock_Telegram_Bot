@@ -13,7 +13,10 @@ load_dotenv()
 
 # Store chat ID
 CHAT_ID = os.getenv("CHAT_ID")
+
+# Global Variable
 bot_running = False
+last_sign = ""
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,17 +35,17 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def repeat_message(application):
     global bot_running
     while bot_running:
-        sign = check_signal()
-        if sign:
-            print(f"Cross Detected : {sign}")
-            await application.bot.send_message(chat_id=CHAT_ID, text=sign)
+        if last_sign:
+            print(f"Cross Detected : {last_sign}")
+            await application.bot.send_message(chat_id=CHAT_ID, text=last_sign)
         await asyncio.sleep(10)
 
 
 # Update data every minute
-async def repeat_get_price_data():
-    global bot_running
+async def repeat_checking_signal():
+    global bot_running, last_sign
     while bot_running:
+        last_sign = check_signal()
         logging.info("Getting price data...")
         update_data("api_dailyprice/stock_data_QQQ.csv")
         await asyncio.sleep(60)
@@ -54,7 +57,7 @@ async def send_startup_message(application):
     bot_running = True
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
     asyncio.create_task(repeat_message(application))
-    asyncio.create_task(repeat_get_price_data())
+    asyncio.create_task(repeat_checking_signal())
 
 async def send_stop_message(application):
     await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline", disable_notification=True)

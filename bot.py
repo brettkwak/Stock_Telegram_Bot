@@ -1,6 +1,6 @@
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Application
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
@@ -27,9 +27,8 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global bot_running
-    bot_running = False
     await context.bot.send_message(chat_id=CHAT_ID, text="Bot Manually Stopped", disable_notification=True)
-    await context.stop()
+    bot_running = False
 
 
 async def repeat_message(application):
@@ -66,9 +65,7 @@ async def send_startup_message(application):
     asyncio.create_task(schedule_shutdown(application))  # Start shutdown task
     asyncio.create_task(repeat_message(application))
     asyncio.create_task(repeat_checking_signal())
-
-async def send_stop_message(application):
-    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline", disable_notification=True)
+    asyncio.create_task(shutdown_watchdog(application))
 
 
 # Schedule Bot Shutdown
@@ -80,8 +77,19 @@ async def schedule_shutdown(application):
 
     await asyncio.sleep(uptime_duration * 60)
 
-    bot_running = False
-    await send_stop_message(application)
+    if bot_running:
+        logging.info("Scheduled shutdown")
+        bot_running = False
+
+
+# Shutdown Watchdog
+async def shutdown_watchdog(application: Application):
+    global bot_running
+    while bot_running:
+        await asyncio.sleep(1)
+
+    logging.info("Bot is now Offline")
+    await application.bot.send_message(chat_id=CHAT_ID, text="Bot is now Offline", disable_notification=True)
     await application.stop()
 
 
@@ -90,7 +98,6 @@ def run_bot():
 
     application = (ApplicationBuilder().token(os.getenv("BOT_TOKEN"))
                    .post_init(send_startup_message)
-                   .post_stop(send_stop_message)
                    .build())
 
     stop_handler = CommandHandler('stop', stop)

@@ -74,14 +74,11 @@ async def send_stop_message(application):
 # Schedule Bot Shutdown
 async def schedule_shutdown(application):
     global bot_running
-    now = datetime.now()
-    shutdown_time = now + timedelta(minutes=5)
+    uptime_duration = 10
 
-    seconds_until_shutdown = (shutdown_time - now).total_seconds()
-    logging.info(f"Bot will shut down in {seconds_until_shutdown / 3600:.2f} hours.")
+    logging.info(f"Bot will shut down in {uptime_duration} minutes.")
 
-    if seconds_until_shutdown > 0:
-        await asyncio.sleep(seconds_until_shutdown)
+    await asyncio.sleep(uptime_duration * 60)
 
     bot_running = False
     await send_stop_message(application)

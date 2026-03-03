@@ -14,7 +14,7 @@ KIS_BASE_URL = "https://openapi.koreainvestment.com:9443"
 s3 = boto3.client("s3")
 
 # Load token from S3
-def load_token() -> str:
+def _load_token() -> str:
     try:
         response = s3.get_object(Bucket=S3_BUCKET, Key=TOKEN_KEY)
         token_data = json.loads(response['Body'].read())
@@ -24,7 +24,7 @@ def load_token() -> str:
         return ''
 
 # Save token to S3
-def save_token(token: str):
+def _save_token(token: str):
     try:
         s3.put_object(
             Bucket=S3_BUCKET,
@@ -51,7 +51,7 @@ def fetch_new_token() -> str:
 
     new_token = res.json().get("access_token")
     if new_token:
-        save_token(new_token)
+        _save_token(new_token)
         return new_token
     else:
         raise Exception("Failed to parse token from KIS response.")

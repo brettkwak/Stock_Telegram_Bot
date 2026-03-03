@@ -4,7 +4,7 @@ from datetime import datetime
 # Convert JSON into dataframe
 def json_to_df(json_data: dict) -> pd.DataFrame:
 
-    data = json_data['output2']
+    data = json_data.get('output2', [])
 
     processed_data = []
 
@@ -18,6 +18,7 @@ def json_to_df(json_data: dict) -> pd.DataFrame:
         processed_data.append(processed_record)
 
     df = pd.DataFrame(processed_data)
-    df['Date'] = pd.to_datetime(df['Date'])
+    if not df.empty:
+        df['Date'] = pd.to_datetime(df['Date'])
 
     return df

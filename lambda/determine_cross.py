@@ -2,6 +2,12 @@ import pandas as pd
 
 def check_signal(df):
 
+    if df is None or df.empty:
+        return "Error: Empty"
+
+    if len(df) < 160:
+        return "Error: Not enough data"
+
     df = df.sort_values(by='Date', ascending=False).reset_index(drop=True)
 
     # Set MA value

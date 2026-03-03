@@ -1,7 +1,11 @@
 from api_dailyprice.get_price_data import get_price_data
 from data_io import *
+import os
 
 def update_data(csv_path):
+
+    current_dir = os.path.dirname(__file__)
+    csv_path = os.path.join(current_dir, "api_dailyprice/stock_data_QQQ.csv")
 
     old_df = csv_to_df(csv_path)
     json_data = get_price_data()

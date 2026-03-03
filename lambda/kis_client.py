@@ -2,6 +2,7 @@ import os
 import json
 import boto3
 import requests
+from datetime import datetime, timezone
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 APP_KEY = os.environ.get("APP_KEY")
@@ -55,3 +56,39 @@ def fetch_new_token() -> str:
         return new_token
     else:
         raise Exception("Failed to parse token from KIS response.")
+
+# Fetch daily QQQ price data
+def fetch_qqq_daily_price() -> dict:
+    token = _load_token()
+
+    if not token:
+        token = fetch_new_token()
+
+    headers = {
+        "content-type": "application/json; charset=utf-8",
+        "authorization": f"Bearer {token}",
+        "appkey": APP_KEY,
+        "appsecret": APP_SECRET,
+        "tr_id": "HHDFS76240000"
+    }
+
+    date_str = datetime.now(timezone.utc).strftime("%Y%m%d")
+    params = {
+        "AUTH": "", "EXCD": "NAS", "SYMB": "QQQ",
+        "GUBN": "0", "BYMD": date_str, "MODP": "1"
+    }
+
+    url = f"{KIS_BASE_URL}/uapi/overseas-price/v1/quotations/dailyprice"
+    response = requests.get(url, headers=headers, params=params)
+
+    if response.status_code == 500:
+        print("Invalid/Expired TOKEN Key. Fetching new token...")
+        token = fetch_new_token()
+        headers["authorization"] = f"Bearer {token}"
+        response = requests.get(url, headers=headers, params=params)
+
+    response.raise_for_status()
+
+    data = response.json()
+    print(f"Retrieved {len(data.get('output2', []))} records from KIS API.")
+    return data

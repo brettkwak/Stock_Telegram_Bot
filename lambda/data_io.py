@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import datetime
 
 # Convert JSON into dataframe
-def json_to_df(json_data: dict):
+def json_to_df(json_data: dict) -> pd.DataFrame:
 
     data = json_data['output2']
 

@@ -1,6 +1,7 @@
 import os
 import json
 import boto3
+import requests
 
 S3_BUCKET = os.environ.get("S3_BUCKET")
 APP_KEY = os.environ.get("APP_KEY")
@@ -33,3 +34,24 @@ def save_token(token: str):
         print("Successfully saved new token to S3.")
     except Exception as e:
         print(f"Failed to save token to S3: {e}")
+
+# Call KIS API to get new token
+def fetch_new_token() -> str:
+    print("Requesting new KIS API Token...")
+    url = f"{KIS_BASE_URL}/oauth2/tokenP"
+    headers = {"content-type": "application/json"}
+    body = {
+        "grant_type": "client_credentials",
+        "appkey": APP_KEY,
+        "appsecret": APP_SECRET
+    }
+
+    res = requests.post(url, headers=headers, json=body)
+    res.raise_for_status()
+
+    new_token = res.json().get("access_token")
+    if new_token:
+        save_token(new_token)
+        return new_token
+    else:
+        raise Exception("Failed to parse token from KIS response.")

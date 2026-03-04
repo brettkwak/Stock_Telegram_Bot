@@ -55,3 +55,52 @@ def send_telegram_alert(message: str):
         print(f"Telegram alert sent successfully.")
     except Exception as e:
         print(f"Failed to send Telegram message: {e}")
+
+# Main entry point for AWS lambda
+def lambda_handler(event, context):
+    print(f"Execution started. Event: {event}")
+
+    try:
+        json_data = fetch_qqq_daily_price()
+        new_df = json_to_df(json_data)
+        if new_df.empty:
+            print("Failed to parse any data from KIS API.")
+            return {"statusCode": 500, "body": "No data from KIS API."}
+
+    except Exception as e:
+        print(f"Error fetching data from KIS: {e}")
+        return {"statusCode": 500, "body": str(e)}
+
+    try:
+        existing_df = read_csv_from_s3()
+        if not existing_df.empty:
+
+            existing_df['Date'] = pd.to_datetime(existing_df['Date'])
+            new_df['Date'] = pd.to_datetime(new_df['Date'])
+
+            latest_existing_df = existing_df['Date'].max()
+
+            existing_df = existing_df[existing_df['Date'] < latest_existing_df]
+            
+            new_filtered_data = new_df[new_df['Date'] >= latest_existing_df]
+
+            merged = pd.concat([existing_df, new_filtered_data])
+
+
+        else:
+            merged = new_df
+    except Exception as e:
+        print(f"Error reading S3 data. Error: {e}")
+        return {"statusCode": 500, "body": str(e)}
+
+    write_csv_to_s3(merged)
+
+    signal = check_signal(merged)
+    print(f"Signal Result: {signal}")
+
+    if "Cross" in signal and "No Cross" not in signal:
+        send_telegram_alert(signal)
+    elif "Error" in signal:
+        print(f"Error while checking signal: {signal}")
+
+    return {"statusCode": 200, "signal": signal}

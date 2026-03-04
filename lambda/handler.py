@@ -88,7 +88,7 @@ def lambda_handler(event, context):
 
             new_filtered_data = new_df[new_df['Date'] >= latest_existing_df]
 
-            merged = pd.concat([existing_df, new_filtered_data])
+            merged = pd.concat([existing_df, new_filtered_data]).sort_values(by='Date', ascending=False).reset_index(drop=True)
 
 
         else:

@@ -37,7 +37,7 @@ BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
 # Send Telegram alert
-def send_telegram_alert(message: str):
+def send_telegram_alert(message: str, silent: bool = False):
     if not BOT_TOKEN or not CHAT_ID:
         print("Telegram credentials missing")
         return
@@ -47,7 +47,11 @@ def send_telegram_alert(message: str):
     text = f"{message}\n🕐 {et_time.strftime('%H:%M')} ET\n🕐 {kst_time.strftime('%H:%M')} KST"
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": CHAT_ID, "text": text}
+    payload = {
+        "chat_id": CHAT_ID,
+        "text": text,
+        "disable_notification": silent,
+    }
 
     try:
         response = requests.post(url, json=payload)
@@ -101,7 +105,7 @@ def lambda_handler(event, context):
     current_minute = datetime.now().minute
 
     if current_minute == 55:
-        send_telegram_alert("🟢 Bot Waking Up")
+        send_telegram_alert("🟢 Bot Waking Up", silent=True)
 
     if "Cross" in signal and "No Cross" not in signal:
         send_telegram_alert(signal)
@@ -109,6 +113,6 @@ def lambda_handler(event, context):
         print(f"Error while checking signal: {signal}")
 
     if current_minute == 0:
-        send_telegram_alert("🔴 Boot Sleeping")
+        send_telegram_alert("🔴 Boot Sleeping", silent=True)
 
     return {"statusCode": 200, "signal": signal}

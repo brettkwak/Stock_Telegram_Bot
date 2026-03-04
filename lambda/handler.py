@@ -81,7 +81,7 @@ def lambda_handler(event, context):
             latest_existing_df = existing_df['Date'].max()
 
             existing_df = existing_df[existing_df['Date'] < latest_existing_df]
-            
+
             new_filtered_data = new_df[new_df['Date'] >= latest_existing_df]
 
             merged = pd.concat([existing_df, new_filtered_data])
@@ -98,9 +98,17 @@ def lambda_handler(event, context):
     signal = check_signal(merged)
     print(f"Signal Result: {signal}")
 
+    current_minute = datetime.now().minute
+
+    if current_minute == 55:
+        send_telegram_alert("🟢 Bot Waking Up")
+
     if "Cross" in signal and "No Cross" not in signal:
         send_telegram_alert(signal)
     elif "Error" in signal:
         print(f"Error while checking signal: {signal}")
+
+    if current_minute == 0:
+        send_telegram_alert("🔴 Boot Sleeping")
 
     return {"statusCode": 200, "signal": signal}
